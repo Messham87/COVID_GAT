@@ -1,3 +1,8 @@
+import numpy as np
+import scipy.sparse as sp
+import torch
+from utils import encode_onehot, normalize_adj, normalize_features
+
 path="./data/cora/"
 dataset="cora"
 """Load citation network dataset (cora only for now)"""
@@ -31,3 +36,8 @@ labels = torch.LongTensor(np.where(labels)[1])
 idx_train = torch.LongTensor(idx_train)
 idx_val = torch.LongTensor(idx_val)
 idx_test = torch.LongTensor(idx_test)
+
+print(idx_features_labels)
+print(edges)
+idx_features_labels
+edges

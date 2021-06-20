@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.sparse as sp
 import torch
+import pickle
 
 
 def encode_onehot(labels):
@@ -72,4 +73,17 @@ def accuracy(output, labels):
     correct = preds.eq(labels).double()
     correct = correct.sum()
     return correct / len(labels)
+
+
+def unpicklefile(fromfile):
+    infile = open(fromfile,'rb')
+    unpickled = pickle.load(infile)
+    infile.close()
+    return unpickled
+
+
+def picklefile(tofile, content):
+    outfile = open(tofile,'wb')
+    pickle.dump(content, outfile)
+    outfile.close()
 
