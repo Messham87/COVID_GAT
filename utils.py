@@ -13,7 +13,7 @@ def encode_onehot(labels):
     return labels_onehot
 
 
-def load_data(path="./data/cora/", dataset="cora"):
+def load_data(path="./data/covid/", dataset="cora"):
     """Load citation network dataset (cora only for now)"""
     print('Loading {} dataset...'.format(dataset))
 
@@ -86,4 +86,3 @@ def picklefile(tofile, content):
     outfile = open(tofile,'wb')
     pickle.dump(content, outfile)
     outfile.close()
-

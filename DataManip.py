@@ -1,7 +1,8 @@
 import numpy as np
 import scipy.sparse as sp
 import torch
-from utils import normalize_adj, normalize_features, unpicklefile
+from utils import normalize_adj, normalize_features
+from utils import unpicklefile
 
 path="./data/cora/"
 dataset="cora"
