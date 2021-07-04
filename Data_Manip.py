@@ -41,5 +41,3 @@ idx_test = torch.LongTensor(idx_test)
 
 print(idx_features_labels)
 print(edges)
-idx_features_labels
-edges
