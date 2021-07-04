@@ -67,22 +67,21 @@ def normalize_features(mx):
     mx = r_mat_inv.dot(mx)
     return mx
 
-
-def accuracy(output, labels):
-    preds = output.max(1)[1].type_as(labels)
-    correct = preds.eq(labels).double()
-    correct = correct.sum()
-    return correct / len(labels)
-
-
 def unpicklefile(fromfile):
-    infile = open(fromfile,'rb')
+    infile = open(fromfile, 'rb')
     unpickled = pickle.load(infile)
     infile.close()
     return unpickled
 
 
 def picklefile(tofile, content):
-    outfile = open(tofile,'wb')
+    outfile = open(tofile, 'wb')
     pickle.dump(content, outfile)
     outfile.close()
+
+
+def accuracy(output, labels):
+    preds = output.max(1)[1].type_as(labels)
+    correct = preds.eq(labels).double()
+    correct = correct.sum()
+    return correct / len(labels)
