@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.sparse as sp
 import torch
+import pickle
 
 
 def encode_onehot(labels):
@@ -12,7 +13,7 @@ def encode_onehot(labels):
     return labels_onehot
 
 
-def load_data(path="./data/cora/", dataset="cora"):
+def load_data(path="./data/covid/", dataset="cora"):
     """Load citation network dataset (cora only for now)"""
     print('Loading {} dataset...'.format(dataset))
 
@@ -73,3 +74,15 @@ def accuracy(output, labels):
     correct = correct.sum()
     return correct / len(labels)
 
+
+def unpicklefile(fromfile):
+    infile = open(fromfile,'rb')
+    unpickled = pickle.load(infile)
+    infile.close()
+    return unpickled
+
+
+def picklefile(tofile, content):
+    outfile = open(tofile,'wb')
+    pickle.dump(content, outfile)
+    outfile.close()
