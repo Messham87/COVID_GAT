@@ -2,6 +2,7 @@ import numpy as np
 import scipy.sparse as sp
 import torch
 import pickle
+from sklearn.model_selection import train_test_split
 
 
 def encode_onehot(labels):
@@ -13,41 +14,45 @@ def encode_onehot(labels):
     return labels_onehot
 
 
-def load_data(path="./data/covid/", dataset="cora"):
-    """Load citation network dataset (cora only for now)"""
+def load_data(path="./data/", dataset="covid"):
+    path = "./data/"
+    dataset = "covid"
+    """Load citation network dataset (cora """
     print('Loading {} dataset...'.format(dataset))
-
-    idx_features_labels = np.genfromtxt("{}{}.content".format(path, dataset), dtype=np.dtype(str))
-    features = sp.csr_matrix(idx_features_labels[:, 1:-1], dtype=np.float32)
-    labels = encode_onehot(idx_features_labels[:, -1])
-
+    feature_path = str(path + dataset + '/idx_features_y')
+    idx_features_labels = unpicklefile(feature_path)
+    features = idx_features_labels[:, 1:-1].astype('float64')
+    labels = np.array(idx_features_labels[:, -1]).astype('float64')
     # build graph
     idx = np.array(idx_features_labels[:, 0], dtype=np.int32)
     idx_map = {j: i for i, j in enumerate(idx)}
-    edges_unordered = np.genfromtxt("{}{}.cites".format(path, dataset), dtype=np.int32)
-    edges = np.array(list(map(idx_map.get, edges_unordered.flatten())), dtype=np.int32).reshape(edges_unordered.shape)
-    adj = sp.coo_matrix((np.ones(edges.shape[0]), (edges[:, 0], edges[:, 1])), shape=(labels.shape[0], labels.shape[0]), dtype=np.float32)
+    idx_path = str(path + dataset + '/edge_list')
+    edges_unordered = unpicklefile(idx_path)
+    edges = np.array(list(map(idx_map.get, edges_unordered.flatten()))).reshape(edges_unordered.shape)
+    adj = sp.coo_matrix((np.ones(edges.shape[0]), (edges[:, 0], edges[:, 1])), shape=(labels.shape[0], labels.shape[0]),
+                        dtype=np.float32)
 
     # build symmetric adjacency matrix
     adj = adj + adj.T.multiply(adj.T > adj) - adj.multiply(adj.T > adj)
-
     features = normalize_features(features)
     adj = normalize_adj(adj + sp.eye(adj.shape[0]))
 
-    idx_train = range(140)
-    idx_val = range(200, 500)
-    idx_test = range(500, 1500)
+    idxs = np.array(range(len(features)))
+    idx_train, idx_rest = train_test_split(idxs, test_size=0.4)
+    idx_val, idx_test = train_test_split(idx_rest, test_size=0.5)
+    # idx_train = range(200)
+    # idx_val = range(200, 290)
+    # idx_test = range(290, 379)
 
     adj = torch.FloatTensor(np.array(adj.todense()))
-    features = torch.FloatTensor(np.array(features.todense()))
-    labels = torch.LongTensor(np.where(labels)[1])
+    features = torch.FloatTensor(features)
+    labels = torch.LongTensor(labels)
 
     idx_train = torch.LongTensor(idx_train)
     idx_val = torch.LongTensor(idx_val)
     idx_test = torch.LongTensor(idx_test)
 
     return adj, features, labels, idx_train, idx_val, idx_test
-
 
 def normalize_adj(mx):
     """Row-normalize sparse matrix"""
@@ -60,25 +65,22 @@ def normalize_adj(mx):
 
 def normalize_features(mx):
     """Row-normalize sparse matrix"""
-    rowsum = np.array(mx.sum(1))
-    r_inv = np.power(rowsum, -1).flatten()
+    rowsum = np.array(mx.sum(1), dtype='float')
+    r_inv = rowsum
+    r_inv[np.nonzero(rowsum)] = np.power(rowsum[np.nonzero(rowsum)], -1).flatten()
     r_inv[np.isinf(r_inv)] = 0.
     r_mat_inv = sp.diags(r_inv)
     mx = r_mat_inv.dot(mx)
     return mx
 
-def unpicklefile(fromfile):
-    infile = open(fromfile, 'rb')
-    unpickled = pickle.load(infile)
-    infile.close()
-    return unpickled
-
-
 def picklefile(tofile, content):
-    outfile = open(tofile, 'wb')
-    pickle.dump(content, outfile)
-    outfile.close()
+  with open(tofile, 'wb') as f:
+    pickle.dump(content, f)
 
+def unpicklefile(fromfile):
+  with open(fromfile, 'rb') as f:
+    unpickled = pickle.load(f)
+  return unpickled
 
 def accuracy(output, labels):
     preds = output.max(1)[1].type_as(labels)
