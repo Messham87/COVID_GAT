@@ -22,7 +22,6 @@ adj = sp.coo_matrix((np.ones(edges.shape[0]), (edges[:, 0], edges[:, 1])), shape
 
 # build symmetric adjacency matrix
 adj = adj + adj.T.multiply(adj.T > adj) - adj.multiply(adj.T > adj)
-
 features = normalize_features(features)
 adj = normalize_adj(adj + sp.eye(adj.shape[0]))
 
