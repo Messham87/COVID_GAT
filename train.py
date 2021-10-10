@@ -22,14 +22,14 @@ nocuda = False
 fastmode = False
 sparse = False
 seed = 72
-epochs = 1000
+epochs = 10000
 lr = 0.0005
 weight_decay = 5e-3
 hidden = 8
 nb_heads = 8
 dropout = 0.2
 alpha = 0.2
-patience = 100
+patience = 1000
 
 cuda = not nocuda and torch.cuda.is_available()
 
@@ -109,8 +109,6 @@ best = epochs + 1
 best_epoch = 0
 for epoch in range(epochs):
     loss_values.append(train(epoch))
-
-
     torch.save(model.state_dict(), '{}.pkl'.format(epoch))
     if loss_values[-1] < best:
         best = loss_values[-1]
