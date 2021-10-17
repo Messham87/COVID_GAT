@@ -19,40 +19,40 @@ def load_data(path="./data/", dataset="covid"):
     dataset = "covid"
     """Load citation network dataset (cora """
     print('Loading {} dataset...'.format(dataset))
-    feature_path = str(path + dataset + '/idx_features_y')
-    idx_features_labels = unpicklefile(feature_path)
-    features = idx_features_labels[:, 1:-1].astype('float64')
-    labels = np.array(idx_features_labels[:, -1]).astype('float64')
+    train_feature_path = str(path + dataset + '/train_idx_features_y')
+    train_idx_features_labels = unpicklefile(train_feature_path)
+    train_features = train_idx_features_labels[:, 1:-1].astype('float64')
+    train_labels = np.array(train_idx_features_labels[:, -1]).astype('float64')
+    valid_feature_path = str(path + dataset + '/valid_idx_features_y')
+    valid_idx_features_labels = unpicklefile(valid_feature_path)
+    valid_features = valid_idx_features_labels[:, 1:-1].astype('float64')
+    valid_labels = np.array(valid_idx_features_labels[:, -1]).astype('float64')
+    test_feature_path = str(path + dataset + '/test_idx_features_y')
+    test_idx_features_labels = unpicklefile(test_feature_path)
+    test_features = test_idx_features_labels[:, 1:-1].astype('float64')
+    test_labels = np.array(test_idx_features_labels[:, -1]).astype('float64')
     # build graph
-    idx = np.array(idx_features_labels[:, 0], dtype=np.int32)
+    idx = np.array(train_idx_features_labels[:, 0], dtype=np.int32)
     idx_map = {j: i for i, j in enumerate(idx)}
     idx_path = str(path + dataset + '/edge_list')
     edges_unordered = unpicklefile(idx_path)
     edges = np.array(list(map(idx_map.get, edges_unordered.flatten()))).reshape(edges_unordered.shape)
-    adj = sp.coo_matrix((np.ones(edges.shape[0]), (edges[:, 0], edges[:, 1])), shape=(labels.shape[0], labels.shape[0]),
+    adj = sp.coo_matrix((np.ones(edges.shape[0]), (edges[:, 0], edges[:, 1])), shape=(train_labels.shape[0], train_labels.shape[0]),
                         dtype=np.float32)
 
     # build symmetric adjacency matrix
     adj = adj + adj.T.multiply(adj.T > adj) - adj.multiply(adj.T > adj)
-    features = normalize_features(features)
     adj = normalize_adj(adj + sp.eye(adj.shape[0]))
 
-    idxs = np.array(range(len(features)))
-    idx_train, idx_rest = train_test_split(idxs, test_size=0.4)
-    idx_val, idx_test = train_test_split(idx_rest, test_size=0.5)
-    # idx_train = range(200)
-    # idx_val = range(200, 290)
-    # idx_test = range(290, 379)
-
     adj = torch.FloatTensor(np.array(adj.todense()))
-    features = torch.FloatTensor(features)
-    labels = torch.LongTensor(labels)
+    train_features = torch.FloatTensor(train_features)
+    valid_features = torch.FloatTensor(valid_features)
+    test_features = torch.FloatTensor(test_features)
+    train_labels = torch.LongTensor(train_labels)
+    valid_labels = torch.LongTensor(valid_labels)
+    test_labels = torch.LongTensor(test_labels)
 
-    idx_train = torch.LongTensor(idx_train)
-    idx_val = torch.LongTensor(idx_val)
-    idx_test = torch.LongTensor(idx_test)
-
-    return adj, features, labels, idx_train, idx_val, idx_test
+    return adj, train_features, train_labels, valid_features, valid_labels, test_features, test_labels
 
 def normalize_adj(mx):
     """Row-normalize sparse matrix"""

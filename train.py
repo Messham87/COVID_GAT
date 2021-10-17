@@ -5,16 +5,13 @@ import os
 import glob
 import time
 import random
-import argparse
 import numpy as np
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.optim as optim
 from torch.autograd import Variable
 from sklearn.metrics import mean_squared_log_error, mean_absolute_error, mean_squared_error
-from scipy.stats import pearsonr
-from utils import load_data, accuracy
+from utils import load_data
 from models import GAT
 
 # Training settings
@@ -23,7 +20,7 @@ fastmode = False
 sparse = False
 seed = 72
 epochs = 10000
-lr = 0.0005
+lr = 0.005
 weight_decay = 5e-3
 hidden = 8
 nb_heads = 8
@@ -40,10 +37,10 @@ if cuda:
     torch.cuda.manual_seed(seed)
 
 # Load data
-adj, features, labels, idx_train, idx_val, idx_test = load_data()
+adj, train_features, train_labels, valid_features, valid_labels, test_features, test_labels = load_data()
 
 # Model and optimizer
-model = GAT(nfeat=features.shape[1],
+model = GAT(nfeat=train_features.shape[1],
                 nhid=hidden,
                 nclass=int(4),
                 dropout=dropout,
@@ -55,49 +52,50 @@ optimizer = optim.Adam(model.parameters(),
 
 if cuda:
     model.cuda()
-    features = features.cuda()
     adj = adj.cuda()
-    labels = labels.cuda()
-    idx_train = idx_train.cuda()
-    idx_val = idx_val.cuda()
-    idx_test = idx_test.cuda()
+    train_features = train_features.cuda()
+    valid_features = valid_features.cuda()
+    test_features = test_features.cuda()
+    train_labels = train_labels.cuda()
+    valid_labels = valid_labels.cuda()
+    test_labels = test_labels.cuda()
 
-features, adj, labels = Variable(features), Variable(adj), Variable(labels)
+adj, train_features, valid_features, test_features, train_labels, valid_labels, test_labels = Variable(adj), Variable(train_features), Variable(valid_features), Variable(test_features), Variable(train_labels), Variable(valid_labels), Variable(test_labels)
 loss = nn.L1Loss()
 
 def train(epoch):
     t = time.time()
     model.train()
     optimizer.zero_grad()
-    output = model(features, adj)
-    loss_train = loss(output[idx_train], labels[idx_train])
-    acc_train = pearsonr(output[idx_train].detach().numpy(), labels[idx_train].detach().numpy())[0]
+    train_output = model(train_features, adj)
+    train_output
+    train_labels.detach().numpy()
+    loss_train = loss(train_output, train_labels)
+    acc_train = np.sqrt(mean_squared_log_error(train_output.detach().numpy(), train_labels.detach().numpy()))
     loss_train.backward()
     optimizer.step()
-
-    if not fastmode:
-        # Evaluate validation set performance separately,
-        # deactivates dropout during validation run.
+    with torch.no_grad():
         model.eval()
-        output = model(features, adj)
 
-    loss_val = loss(output[idx_val], labels[idx_val])
-    acc_val = pearsonr(output[idx_val].detach().numpy(), labels[idx_val].detach().numpy())[0]
-    print('Epoch: {:04d}'.format(epoch+1),
-          'loss_train: {:.4f}'.format(loss_train.data.item()),
-          'acc_train: {:.4f}'.format(acc_train),
-          'loss_val: {:.4f}'.format(loss_val.data.item()),
-          'acc_val: {:.4f}'.format(acc_val),
-          'time: {:.4f}s'.format(time.time() - t))
+        valid_output = model(valid_features, adj)
+
+        loss_val = loss(valid_output, valid_labels)
+        acc_val = np.sqrt(mean_squared_log_error(valid_output.detach().numpy(), valid_labels.detach().numpy()))
+        print('Epoch: {:04d}'.format(epoch+1),
+              'loss_train: {:.4f}'.format(loss_train.data.item()),
+              'acc_train: {:.4f}'.format(acc_train),
+              'loss_val: {:.4f}'.format(loss_val.data.item()),
+              'acc_val: {:.4f}'.format(acc_val),
+              'time: {:.4f}s'.format(time.time() - t))
 
     return loss_val.data.item()
 
 
 def compute_test():
     model.eval()
-    output = model(features, adj)
-    loss_test = loss(output[idx_test], labels[idx_test])
-    acc_test = pearsonr(output[idx_test].detach().numpy(), labels[idx_test].detach().numpy())[0]
+    test_output = model(test_features, adj)
+    loss_test = loss(test_output, test_labels)
+    acc_test = np.sqrt(mean_squared_log_error(test_output.detach().numpy(), test_labels.detach().numpy()))
     print("Test set results:",
           "loss= {:.4f}".format(loss_test.item()),
           "accuracy= {:.4f}".format(acc_test.item()))
@@ -136,7 +134,7 @@ print("Optimization Finished!")
 print("Total time elapsed: {:.4f}s".format(time.time() - t_total))
 
 # Restore best model
-print('Loading {}th epoch'.format(best_epoch))
+print('Loading epoch {}'.format(best_epoch))
 model.load_state_dict(torch.load('{}.pkl'.format(best_epoch)))
 
 # Testing
