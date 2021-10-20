@@ -17,10 +17,11 @@ class GAT(nn.Module):
         # _ in range(nheads)] for i, attention2 in enumerate(self.attentions2): self.add_module('attention2_{
         # }'.format(i), attention2) self.out_att2 = GraphAttentionLayer(nfeat*nhid, nclass, dropout=dropout,
         # alpha=alpha, concat=False)
-        # self.lin1 = nn.Linear(1516, 7588)
-        # self.lin2 = nn.Linear(7588, 3680)
-        # self.lin3 = nn.Linear(3680, 379)
-        self.lin4 = nn.Linear(379, 379)
+        self.lin1 = nn.Linear(nhid*nclass, 16882)
+        self.lin2 = nn.Linear(7588, 3680)
+        self.lin3 = nn.Linear(3680, 379)
+        #self.lin4 = nn.Linear(379, 379)
+        print(nhid*nclass)
 
     def forward(self, x, adj):
         x = F.dropout(x, self.dropout, training=self.training)
@@ -31,8 +32,8 @@ class GAT(nn.Module):
         # x = F.dropout(x, self.dropout, training=self.training)
         x = torch.flatten(self.out_att(x, adj))
         # print(x.shape)
-        # x = self.lin1(x)
-        # x = self.lin2(x)
-        # x = self.lin3(x)
-        x = self.lin4(x)
+        x = self.lin1(x)
+        x = self.lin2(x)
+        x = self.lin3(x)
+        # x = self.lin4(x)
         return F.relu(x)
