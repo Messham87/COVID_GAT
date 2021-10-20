@@ -27,6 +27,7 @@ nb_heads = 8
 dropout = 0.2
 alpha = 0.2
 patience = 100
+nclass = int(32)
 
 cuda = not nocuda and torch.cuda.is_available()
 
@@ -42,7 +43,7 @@ adj, train_features, train_labels, valid_features, valid_labels, test_features, 
 # Model and optimizer
 model = GAT(nfeat=train_features.shape[1],
                 nhid=hidden,
-                nclass=int(1),
+                nclass=nclass,
                 dropout=dropout,
                 nheads=nb_heads,
                 alpha=alpha)
