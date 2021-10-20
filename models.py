@@ -13,11 +13,10 @@ class GAT(nn.Module):
         for i, attention in enumerate(self.attentions):
             self.add_module('attention_{}'.format(i), attention)
         self.out_att = GraphAttentionLayer(nhid * nheads, nclass, dropout=dropout, alpha=alpha, concat=False)
-        # self.attentions2 = [GraphAttentionLayer(nfeat * nhid, nhid, dropout=dropout, alpha=alpha, concat=False) for _ in
-        #                     range(nheads)]
-        # for i, attention2 in enumerate(self.attentions2):
-        #     self.add_module('attention2_{}'.format(i), attention2)
-        # self.out_att2 = GraphAttentionLayer(nfeat*nhid, nclass, dropout=dropout, alpha=alpha, concat=False)
+        # self.attentions2 = [GraphAttentionLayer(nfeat * nhid, nhid, dropout=dropout, alpha=alpha, concat=False) for
+        # _ in range(nheads)] for i, attention2 in enumerate(self.attentions2): self.add_module('attention2_{
+        # }'.format(i), attention2) self.out_att2 = GraphAttentionLayer(nfeat*nhid, nclass, dropout=dropout,
+        # alpha=alpha, concat=False)
         self.lin1 = nn.Linear(1516, 7588)
         self.lin2 = nn.Linear(7588, 3680)
         self.lin3 = nn.Linear(3680, 379)
