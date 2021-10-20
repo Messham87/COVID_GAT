@@ -124,12 +124,14 @@ for epoch in range(epochs):
     for file in files:
         epoch_nb = int(file.split('.')[0])
         if epoch_nb < best_epoch:
+            open(file, 'w').close() #overwrite and make the file blank instead - ref: https://stackoverflow.com/a/4914288/3553367
             os.remove(file)
 
 files = glob.glob('*.pkl')
 for file in files:
     epoch_nb = int(file.split('.')[0])
     if epoch_nb > best_epoch:
+        open(file, 'w').close() #overwrite and make the file blank instead - ref: https://stackoverflow.com/a/4914288/3553367
         os.remove(file)
 
 print("Optimization Finished!")
