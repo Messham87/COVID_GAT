@@ -69,9 +69,9 @@ def train(epoch):
     optimizer.zero_grad()
     train_output = model(train_features, adj)
     train_output
-    train_labels.detach().numpy()
+    train_labels.detach().cpu().numpy()
     loss_train = loss(train_output, train_labels)
-    acc_train = np.sqrt(mean_squared_log_error(train_output.detach().numpy(), train_labels.detach().numpy()))
+    acc_train = np.sqrt(mean_squared_log_error(train_output.detach().cpu().numpy(), train_labels.detach().cpu().numpy()))
     loss_train.backward()
     optimizer.step()
     with torch.no_grad():
@@ -80,7 +80,7 @@ def train(epoch):
         valid_output = model(valid_features, adj)
 
         loss_val = loss(valid_output, valid_labels)
-        acc_val = np.sqrt(mean_squared_log_error(valid_output.detach().numpy(), valid_labels.detach().numpy()))
+        acc_val = np.sqrt(mean_squared_log_error(valid_output.detach().cpu().numpy(), valid_labels.detach().cpu().numpy()))
         print('Epoch: {:04d}'.format(epoch+1),
               'loss_train: {:.4f}'.format(loss_train.data.item()),
               'acc_train: {:.4f}'.format(acc_train),
@@ -95,7 +95,7 @@ def compute_test():
     model.eval()
     test_output = model(test_features, adj)
     loss_test = loss(test_output, test_labels)
-    acc_test = np.sqrt(mean_squared_log_error(test_output.detach().numpy(), test_labels.detach().numpy()))
+    acc_test = np.sqrt(mean_squared_log_error(test_output.detach().cpu().numpy(), test_labels.detach().cpu().numpy()))
     print("Test set results:",
           "loss= {:.4f}".format(loss_test.item()),
           "accuracy= {:.4f}".format(acc_test.item()))
@@ -133,7 +133,7 @@ for file in files:
 print("Optimization Finished!")
 print("Total time elapsed: {:.4f}s".format(time.time() - t_total))
 
-# Restore best model
+# Restore best model;
 print('Loading epoch {}'.format(best_epoch))
 model.load_state_dict(torch.load('{}.pkl'.format(best_epoch)))
 
