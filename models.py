@@ -30,8 +30,6 @@ class GAT(nn.Module):
         # x = F.dropout(x, self.dropout, training=self.training)
         x = torch.flatten(self.out_att(x, adj))
         x = self.lin1(x)
-        x = F.relu(x)
         x = self.lin2(x)
-        x = F.relu(x)
         x = self.lin3(x)
         return torch.round(F.relu(x))
