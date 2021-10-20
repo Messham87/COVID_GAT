@@ -20,15 +20,17 @@ class GAT(nn.Module):
         # self.lin1 = nn.Linear(1516, 7588)
         # self.lin2 = nn.Linear(7588, 3680)
         # self.lin3 = nn.Linear(3680, 379)
-        self.lin4 = nn.Linear(3032, 379)
+        self.lin4 = nn.Linear(379, 379)
 
     def forward(self, x, adj):
         x = F.dropout(x, self.dropout, training=self.training)
         x = torch.cat([att(x, adj) for att in self.attentions], dim=1)
+        # print(x.shape)
         x = F.dropout(x, self.dropout, training=self.training)
         # x = torch.cat([att(x, adj) for att in self.attentions2], dim=1)
         # x = F.dropout(x, self.dropout, training=self.training)
         x = torch.flatten(self.out_att(x, adj))
+        # print(x.shape)
         # x = self.lin1(x)
         # x = self.lin2(x)
         # x = self.lin3(x)
