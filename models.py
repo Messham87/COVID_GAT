@@ -18,7 +18,7 @@ class GAT(nn.Module):
         # }'.format(i), attention2) self.out_att2 = GraphAttentionLayer(nfeat*nhid, nclass, dropout=dropout,
         # alpha=alpha, concat=False)
         self.lin1 = nn.Linear(nhid*nclass, 16882)
-        self.lin2 = nn.Linear(7588, 3680)
+        self.lin2 = nn.Linear(16882, 3680)
         self.lin3 = nn.Linear(3680, 379)
         #self.lin4 = nn.Linear(379, 379)
         print(nhid*nclass)
