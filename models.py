@@ -17,7 +17,7 @@ class GAT(nn.Module):
         # _ in range(nheads)] for i, attention2 in enumerate(self.attentions2): self.add_module('attention2_{
         # }'.format(i), attention2) self.out_att2 = GraphAttentionLayer(nfeat*nhid, nclass, dropout=dropout,
         # alpha=alpha, concat=False)
-        self.lin1 = nn.Linear(nhid*nclass, 16882)
+        self.lin1 = nn.Linear(379, 16882)
         self.lin2 = nn.Linear(16882, 3680)
         self.lin3 = nn.Linear(3680, 379)
         #self.lin4 = nn.Linear(379, 379)
