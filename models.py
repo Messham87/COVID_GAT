@@ -35,4 +35,4 @@ class GAT(nn.Module):
         # x = self.lin2(x)
         # x = self.lin3(x)
         x = self.lin4(x)
-        return torch.round(F.relu(x))
+        return F.relu(x)
