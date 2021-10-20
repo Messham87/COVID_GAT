@@ -22,7 +22,7 @@ seed = 72
 epochs = 10000
 lr = 0.005
 weight_decay = 5e-3
-hidden = 8
+hidden = 379
 nb_heads = 8
 dropout = 0.2
 alpha = 0.2
@@ -49,6 +49,7 @@ model = GAT(nfeat=train_features.shape[1],
 optimizer = optim.Adam(model.parameters(), 
                        lr=lr, 
                        weight_decay=weight_decay)
+print(model)
 
 if cuda:
     model.cuda()
