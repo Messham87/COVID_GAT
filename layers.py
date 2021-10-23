@@ -22,7 +22,6 @@ class GraphAttentionLayer(nn.Module):
         nn.init.xavier_uniform_(self.a.data, gain=1.414)
 
         self.leakyrelu = nn.LeakyReLU(self.alpha)
-        self.relu = F.relu()
 
     def forward(self, h, adj):
         Wh = torch.mm(h, self.W) # h.shape: (N, in_features), Wh.shape: (N, out_features)
@@ -35,7 +34,7 @@ class GraphAttentionLayer(nn.Module):
         h_prime = torch.matmul(attention, Wh)
 
         if self.concat:
-            return F.relu(h_prime)
+            return F.elu(h_prime)
         else:
             return h_prime
 
@@ -48,7 +47,7 @@ class GraphAttentionLayer(nn.Module):
         Wh2 = torch.matmul(Wh, self.a[self.out_features:, :])
         # broadcast add
         e = Wh1 + Wh2.T
-        return F.relu(e)
+        return self.leakyrelu(e)
 
     def __repr__(self):
         return self.__class__.__name__ + ' (' + str(self.in_features) + ' -> ' + str(self.out_features) + ')'
