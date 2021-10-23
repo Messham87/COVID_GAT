@@ -47,7 +47,7 @@ class GraphAttentionLayer(nn.Module):
         Wh2 = torch.matmul(Wh, self.a[self.out_features:, :])
         # broadcast add
         e = Wh1 + Wh2.T
-        return self.relu(e)
+        return F.relu(e)
 
     def __repr__(self):
         return self.__class__.__name__ + ' (' + str(self.in_features) + ' -> ' + str(self.out_features) + ')'
