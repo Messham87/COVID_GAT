@@ -29,12 +29,12 @@ class GraphAttentionLayer(nn.Module):
 
         zero_vec = -9e15*torch.ones_like(e)
         attention = torch.where(adj > 0, e, zero_vec)
-        attention = F.softmax(attention, dim=1)
+        attention = F.relu(attention)
         attention = F.dropout(attention, self.dropout, training=self.training)
         h_prime = torch.matmul(attention, Wh)
 
         if self.concat:
-            return F.relu(h_prime)
+            return F.elu(h_prime)
         else:
             return h_prime
 
@@ -47,7 +47,7 @@ class GraphAttentionLayer(nn.Module):
         Wh2 = torch.matmul(Wh, self.a[self.out_features:, :])
         # broadcast add
         e = Wh1 + Wh2.T
-        return self.relu(e)
+        return self.leakyrelu(e)
 
     def __repr__(self):
         return self.__class__.__name__ + ' (' + str(self.in_features) + ' -> ' + str(self.out_features) + ')'
