@@ -41,7 +41,7 @@ if cuda:
 adj, train_features, train_labels, valid_features, valid_labels, test_features, test_labels = load_data()
 
 # Model and optimizer
-model = TwoLayerGATMLP(nfeat=train_features.shape[1],
+model = TwoLayerGAT(nfeat=train_features.shape[1],
                 nhid=hidden,
                 nclass=nclass,
                 dropout=dropout,

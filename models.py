@@ -3,30 +3,30 @@ import torch.nn as nn
 import torch.nn.functional as F
 from layers import GraphAttentionLayer
 
-class OneLayerGAT(nn.Module):
-    def __init__(self, nfeat, nhid, nclass, dropout, alpha, nheads):
-        """Dense version of GAT."""
-        super(OneLayerGAT, self).__init__()
-        self.dropout = dropout
-        self.attentions = [GraphAttentionLayer(nfeat, nhid, dropout=dropout, alpha=alpha, concat=True) for _ in
-                           range(nheads)]
-        for i, attention in enumerate(self.attentions):
-            self.add_module('attention_{}'.format(i), attention)
-        self.out_att = GraphAttentionLayer(nhid * nheads, nhid * nheads, dropout=dropout, alpha=alpha, concat=True)
-        # self.attentions2 = [GraphAttentionLayer(nfeat * nhid, nhid, dropout=dropout, alpha=alpha, concat=False) for
-        # _ in range(nheads)] for i, attention2 in enumerate(self.attentions2): self.add_module('attention2_{
-        # }'.format(i), attention2) self.out_att2 = GraphAttentionLayer(nfeat*nhid, nclass, dropout=dropout,
-        # alpha=alpha, concat=False)
-        self.lin1 = nn.Linear(nhid * nheads * 379, 379)
-
-    def forward(self, x, adj):
-        # x = F.dropout(x, self.dropout, training=self.training)
-        x = torch.cat([att(x, adj) for att in self.attentions], dim=1)
-        # x = F.dropout(x, self.dropout, training=self.training)
-        x = torch.flatten(self.out_att(x, adj))
-        x = self.lin1(x)
-        # x = self.lin4(x)
-        return F.relu(x)
+# class OneLayerGAT(nn.Module):
+#     def __init__(self, nfeat, nhid, nclass, dropout, alpha, nheads):
+#         """Dense version of GAT."""
+#         super(OneLayerGAT, self).__init__()
+#         self.dropout = dropout
+#         self.attentions = [GraphAttentionLayer(nfeat, nhid, dropout=dropout, alpha=alpha, concat=True) for _ in
+#                            range(nheads)]
+#         for i, attention in enumerate(self.attentions):
+#             self.add_module('attention_{}'.format(i), attention)
+#         self.out_att = GraphAttentionLayer(nhid * nheads, nhid * nheads, dropout=dropout, alpha=alpha, concat=True)
+#         # self.attentions2 = [GraphAttentionLayer(nfeat * nhid, nhid, dropout=dropout, alpha=alpha, concat=False) for
+#         # _ in range(nheads)] for i, attention2 in enumerate(self.attentions2): self.add_module('attention2_{
+#         # }'.format(i), attention2) self.out_att2 = GraphAttentionLayer(nfeat*nhid, nclass, dropout=dropout,
+#         # alpha=alpha, concat=False)
+#         self.lin1 = nn.Linear(nhid * nheads * 379, 379)
+#
+#     def forward(self, x, adj):
+#         x = F.dropout(x, self.dropout, training=self.training)
+#         x = torch.cat([att(x, adj) for att in self.attentions], dim=1)
+#         x = F.dropout(x, self.dropout, training=self.training)
+#         x = torch.flatten(self.out_att(x, adj))
+#         x = self.lin1(x)
+#         # x = self.lin4(x)
+#         return F.relu(x)
 
 class TwoLayerGAT(nn.Module):
     def __init__(self, nfeat, nhid, nclass, dropout, alpha, nheads):
@@ -46,14 +46,15 @@ class TwoLayerGAT(nn.Module):
         self.lin1 = nn.Linear(int((nhid/2) * nheads) * 379, 379)
 
     def forward(self, x, adj):
+        x = F.dropout(x, self.dropout, training=self.training)
         x = torch.cat([att(x, adj) for att in self.attentions], dim=1)
-        x = self.out_att(x, adj)
+        x = F.dropout(x, self.dropout, training=self.training)
+        x = torch.sigmoid(self.out_att(x, adj))
         x = torch.cat([att(x, adj) for att in self.attentions2], dim=1)
-        # x = F.dropout(x, self.dropout, training=self.training)
-        x = torch.flatten(self.out_att2(x, adj))
-        print(x.shape)
+        x = F.dropout(x, self.dropout, training=self.training)
+        x = torch.sigmoid(self.out_att2(x, adj))
+        x = torch.flatten(x)
         x = self.lin1(x)
-        # x = self.lin4(x)
         return F.relu(x)
 
 class OneLayerGAT(nn.Module):
@@ -72,7 +73,8 @@ class OneLayerGAT(nn.Module):
         x = F.dropout(x, self.dropout, training=self.training)
         x = torch.cat([att(x, adj) for att in self.attentions], dim=1)
         x = F.dropout(x, self.dropout, training=self.training)
-        x = torch.flatten(self.out_att(x, adj))
+        x = torch.sigmoid(self.out_att(x, adj))
+        x = torch.flatten(x)
         x = self.lin1(x)
         return F.relu(x)
 
@@ -100,10 +102,11 @@ class TwoLayerGATMLP(nn.Module):
         x = F.dropout(x, self.dropout, training=self.training)
         x = torch.cat([att(x, adj) for att in self.attentions], dim=1)
         x = F.dropout(x, self.dropout, training=self.training)
-        x = self.out_att(x, adj)
+        x = torch.sigmoid(self.out_att(x, adj))
         x = torch.cat([att(x, adj) for att in self.attentions2], dim=1)
         x = F.dropout(x, self.dropout, training=self.training)
-        x = torch.flatten(self.out_att2(x, adj))
+        x = torch.sigmoid(self.out_att2(x, adj))
+        x = torch.flatten(x)
         x = self.lin1(x)
         x = torch.sigmoid(x)
         x = self.lin2(x)
@@ -111,7 +114,6 @@ class TwoLayerGATMLP(nn.Module):
         x = self.lin3(x)
         x = torch.sigmoid(x)
         x = self.lin4(x)
-        # x = self.lin4(x)
         return F.relu(x)
 
 class GATMLP(nn.Module):
@@ -140,5 +142,19 @@ class GATMLP(nn.Module):
         x = self.lin3(x)
         x = torch.sigmoid(x)
         x = self.lin4(x)
-        # x = self.lin4(x)
+        return F.relu(x)
+
+
+class GCN(nn.Module):
+    def __init__(self, nfeat, nhid, nclass, dropout):
+        super(GCN, self).__init__()
+
+        self.gc1 = GraphConvolution(nfeat, nhid)
+        self.gc2 = GraphConvolution(nhid, nclass)
+        self.dropout = dropout
+
+    def forward(self, x, adj):
+        x = F.relu(self.gc1(x, adj))
+        x = F.dropout(x, self.dropout, training=self.training)
+        x = self.gc2(x, adj)
         return F.relu(x)

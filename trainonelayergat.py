@@ -73,7 +73,7 @@ def train(epoch):
     train_output
     train_labels.detach().cpu().numpy()
     loss_train = loss(train_output, train_labels)
-    acc_train = torch.sqrt(acc(train_output, train_labels))
+    acc_train = torch.sqrt(acc(torch.log(train_output+1), torch.log(train_labels+1)))
     loss_train.backward()
     optimizer.step()
     with torch.no_grad():
@@ -82,7 +82,7 @@ def train(epoch):
         valid_output = model(valid_features, adj)
 
         loss_val = loss(valid_output, valid_labels)
-        acc_val = torch.sqrt(acc(valid_output, valid_labels))
+        acc_val = torch.sqrt(acc(torch.log(valid_output+1), torch.log(valid_labels+1)))
         print('Epoch: {:04d}'.format(epoch+1),
               'loss_train: {:.4f}'.format(loss_train.data.item()),
               'acc_train: {:.4f}'.format(acc_train),
@@ -97,7 +97,7 @@ def compute_test():
     model.eval()
     test_output = model(test_features, adj)
     loss_test = loss(test_output, test_labels)
-    acc_test = torch.sqrt(acc(test_output, test_labels))
+    acc_test = torch.sqrt(acc(torch.log(test_output+1), torch.log(test_labels+1)))
     print("Test set results:",
           "loss= {:.4f}".format(loss_test.item()),
           "accuracy= {:.4f}".format(acc_test.item()))
@@ -143,6 +143,3 @@ model.load_state_dict(torch.load('{}.pkl'.format(best_epoch)))
 
 # Testing
 compute_test()
-
-#get the results
-# output.max(1)[1]
