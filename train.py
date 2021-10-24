@@ -12,7 +12,7 @@ import torch.optim as optim
 from torch.autograd import Variable
 from sklearn.metrics import mean_squared_log_error, mean_absolute_error, mean_squared_error
 from utils import load_data
-from models import GAT
+from models import GATMLP
 
 # Training settings
 nocuda = False
@@ -22,12 +22,12 @@ seed = 72
 epochs = 1000
 lr = 0.005
 weight_decay = 5e-3
-hidden = 379
+hidden = 8
 nb_heads = 8
 dropout = 0.2
 alpha = 0.2
 patience = 100
-nclass = int(32)
+nclass = int(1)
 
 cuda = not nocuda and torch.cuda.is_available()
 
@@ -41,7 +41,7 @@ if cuda:
 adj, train_features, train_labels, valid_features, valid_labels, test_features, test_labels = load_data()
 
 # Model and optimizer
-model = GAT(nfeat=train_features.shape[1],
+model = GATMLP(nfeat=train_features.shape[1],
                 nhid=hidden,
                 nclass=nclass,
                 dropout=dropout,
