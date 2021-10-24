@@ -113,14 +113,13 @@ class MLP(nn.Module):
         """Simple MLP"""
         super(MLP, self).__init__()
         self.dropout = dropout
-        self.lin1 = nn.Linear(nfeat*379, 12112)
+        self.lin1 = nn.Linear(276, 12112)
         self.lin2 = nn.Linear(12112, 6056)
         self.lin3 = nn.Linear(6056, 3028)
         self.lin4 = nn.Linear(3028, 379)
 
     def forward(self, x, adj):
         x = F.dropout(x, self.dropout, training=self.training)
-        x = torch.flatten(x)
         x = self.lin1(x)
         x = torch.sigmoid(x)
         x = self.lin2(x)
