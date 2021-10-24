@@ -70,8 +70,6 @@ def train(epoch):
     model.train()
     optimizer.zero_grad()
     train_output = model(train_features, adj)
-    train_output
-    train_labels.detach().cpu().numpy()
     loss_train = loss(train_output, train_labels)
     acc_train = torch.sqrt(acc(torch.log(train_output+1), torch.log(train_labels+1)))
     loss_train.backward()

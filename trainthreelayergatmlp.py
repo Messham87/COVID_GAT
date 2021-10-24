@@ -40,8 +40,12 @@ if cuda:
 adj, train_features, train_labels, valid_features, valid_labels, test_features, test_labels = load_data()
 
 # Model and optimizer
-model = MLP(nfeat=train_features.shape[1],
-                dropout=dropout)
+model = ThreeLayerGATMLP(nfeat=train_features.shape[1],
+                nhid=hidden,
+                nclass=nclass,
+                dropout=dropout,
+                nheads=nb_heads,
+                alpha=alpha)
 optimizer = optim.Adam(model.parameters(), 
                        lr=lr, 
                        weight_decay=weight_decay)
