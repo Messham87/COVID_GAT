@@ -133,7 +133,7 @@ class GATMLP(nn.Module):
         for i, attention in enumerate(self.attentions):
             self.add_module('attention_{}'.format(i), attention)
         self.out_att = GraphAttentionLayer(nhid * nheads, nhid * nheads, dropout=dropout, alpha=alpha, concat=True)
-        self.lin1 = nn.Linear(nhid*nheads * 379, 12112)
+        self.lin1 = nn.Linear(64, 12112)
         self.lin2 = nn.Linear(12112, 6056)
         self.lin3 = nn.Linear(6056, 3028)
         self.lin4 = nn.Linear(3028, 379)
