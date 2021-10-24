@@ -1,4 +1,6 @@
-# Covid Prediction PyTorch Graph Attention Network
+# COVID GAT
+
+Covid Prediction PyTorch Graph Attention Network
 
 This repo is a PyTorch implementation of a Graph Attention Network for the prediction of covid cases based on an adjacency matrix of geographical nodes with edges indicating commuting between nodes and edge features including population, proportion of population 60+ years old and previous covid deaths and cases.
 
