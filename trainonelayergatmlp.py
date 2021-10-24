@@ -12,7 +12,7 @@ import torch.optim as optim
 from torch.autograd import Variable
 from sklearn.metrics import mean_squared_log_error, mean_absolute_error, mean_squared_error
 from utils import load_data
-from models import GATMLP, OneLayerGAT, TwoLayerGAT
+from models import GATMLP, OneLayerGAT
 
 # Training settings
 nocuda = False
@@ -41,7 +41,7 @@ if cuda:
 adj, train_features, train_labels, valid_features, valid_labels, test_features, test_labels = load_data()
 
 # Model and optimizer
-model = OneLayerGAT(nfeat=train_features.shape[1],
+model = GATMLP(nfeat=train_features.shape[1],
                 nhid=hidden,
                 nclass=nclass,
                 dropout=dropout,
