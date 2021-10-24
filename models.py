@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from layers import GraphAttentionLayer
+from layers import GraphAttentionLayer, GraphConvolution
 
 # class OneLayerGAT(nn.Module):
 #     def __init__(self, nfeat, nhid, nclass, dropout, alpha, nheads):
@@ -56,7 +56,7 @@ class TwoLayerGAT(nn.Module):
         x = torch.flatten(x)
         x = self.lin1(x)
         return F.relu(x)
-
+#
 class OneLayerGAT(nn.Module):
     def __init__(self, nfeat, nhid, nclass, dropout, alpha, nheads):
         """Dense version of GAT."""
@@ -134,7 +134,8 @@ class GATMLP(nn.Module):
         x = F.dropout(x, self.dropout, training=self.training)
         x = torch.cat([att(x, adj) for att in self.attentions], dim=1)
         x = F.dropout(x, self.dropout, training=self.training)
-        x = torch.flatten(self.out_att(x, adj))
+        x = torch.sigmoid(self.out_att(x, adj))
+        x = torch.flatten(x)
         x = self.lin1(x)
         x = torch.sigmoid(x)
         x = self.lin2(x)
@@ -154,7 +155,7 @@ class GCN(nn.Module):
         self.dropout = dropout
 
     def forward(self, x, adj):
-        x = F.relu(self.gc1(x, adj))
+        x = torch.sigmoid(self.gc1(x, adj))
         x = F.dropout(x, self.dropout, training=self.training)
         x = self.gc2(x, adj)
         return F.relu(x)

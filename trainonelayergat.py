@@ -12,7 +12,7 @@ import torch.optim as optim
 from torch.autograd import Variable
 from sklearn.metrics import mean_squared_log_error, mean_absolute_error, mean_squared_error
 from utils import load_data
-from models import GATMLP, OneLayerGAT
+from models import GATMLP, OneLayerGAT, TwoLayerGAT, TwoLayerGATMLP, GCN
 
 # Training settings
 nocuda = False
