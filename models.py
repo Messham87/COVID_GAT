@@ -70,8 +70,7 @@ class ThreeLayerGAT(nn.Module):
         self.attentions3 = [GraphAttentionLayer(int(nhid * nheads/2), int(nhid / 4), dropout=dropout, alpha=alpha, concat=True) for _ in range(nheads)]
         for i, attention in enumerate(self.attentions3):
             self.add_module('attention2_{}'.format(i), attention)
-        self.out_att3 = GraphAttentionLayer(int((nhid / 4) * nheads), int((nhid / 4) * nheads), dropout=dropout,
-                                            alpha=alpha, concat=True)
+        self.out_att3 = GraphAttentionLayer(int((nhid / 4) * nheads), int((nhid / 4) * nheads), dropout=dropout, alpha=alpha, concat=True)
         self.lin1 = nn.Linear(int((nhid / 4) * nheads), 379)
 
     def forward(self, x, adj):
