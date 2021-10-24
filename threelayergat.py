@@ -75,9 +75,7 @@ def train(epoch):
     optimizer.step()
     with torch.no_grad():
         model.eval()
-
         valid_output = model(valid_features, adj)
-
         loss_val = loss(valid_output, valid_labels)
         acc_val = torch.sqrt(acc(torch.log(valid_output+1), torch.log(valid_labels+1)))
         print('Epoch: {:04d}'.format(epoch+1),
@@ -140,3 +138,4 @@ model.load_state_dict(torch.load('{}.pkl'.format(best_epoch)))
 
 # Testing
 compute_test()
+

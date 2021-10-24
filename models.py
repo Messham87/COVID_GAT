@@ -13,7 +13,7 @@ class OneLayerGAT(nn.Module):
         for i, attention in enumerate(self.attentions):
             self.add_module('attention_{}'.format(i), attention)
         self.out_att = GraphAttentionLayer(nhid * nheads, nhid * nheads, dropout=dropout, alpha=alpha, concat=True)
-        self.lin1 = nn.Linear(nhid * nheads, 1)
+        self.lin1 = nn.Linear(nhid * nheads, 379)
 
     def forward(self, x, adj):
         x = F.dropout(x, self.dropout, training=self.training)
@@ -58,20 +58,16 @@ class ThreeLayerGAT(nn.Module):
         """Dense version of GAT."""
         super(ThreeLayerGAT, self).__init__()
         self.dropout = dropout
-        self.attentions = [GraphAttentionLayer(nfeat, nhid, dropout=dropout, alpha=alpha, concat=True) for _ in
-                           range(nheads)]
+        self.attentions = [GraphAttentionLayer(nfeat, nhid, dropout=dropout, alpha=alpha, concat=True) for _ in range(nheads)]
         for i, attention in enumerate(self.attentions):
             self.add_module('attention_{}'.format(i), attention)
         self.out_att = GraphAttentionLayer(nhid * nheads, nhid * nheads, dropout=dropout, alpha=alpha, concat=True)
-        self.attentions2 = [GraphAttentionLayer(nhid * nheads, int(nhid/2), dropout=dropout, alpha=alpha, concat=True) for _ in
-                           range(nheads)]
+        self.attentions2 = [GraphAttentionLayer(nhid * nheads, int(nhid/2), dropout=dropout, alpha=alpha, concat=True) for _ in range(nheads)]
         for i, attention in enumerate(self.attentions2):
             self.add_module('attention2_{}'.format(i), attention)
         self.out_att2 = GraphAttentionLayer(int((nhid/2) * nheads), int((nhid/2) * nheads), dropout=dropout, alpha=alpha, concat=True)
         self.lin1 = nn.Linear(int((nhid/2) * nheads) * 379, 379)
-        self.attentions3 = [GraphAttentionLayer(int(nhid * nheads/2), int(nhid / 4), dropout=dropout, alpha=alpha, concat=True)
-                            for _ in
-                            range(nheads)]
+        self.attentions3 = [GraphAttentionLayer(int(nhid * nheads/2), int(nhid / 4), dropout=dropout, alpha=alpha, concat=True) for _ in range(nheads)]
         for i, attention in enumerate(self.attentions3):
             self.add_module('attention2_{}'.format(i), attention)
         self.out_att3 = GraphAttentionLayer(int((nhid / 4) * nheads), int((nhid / 4) * nheads), dropout=dropout,
