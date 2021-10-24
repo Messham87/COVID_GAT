@@ -138,7 +138,7 @@ class GATMLP(nn.Module):
         for i, attention in enumerate(self.attentions):
             self.add_module('attention_{}'.format(i), attention)
         self.out_att = GraphAttentionLayer(nhid * nheads, nhid * nheads, dropout=dropout, alpha=alpha, concat=True)
-        self.lin1 = nn.Linear(nhid*nheads, 12112)
+        self.lin1 = nn.Linear(nhid*nheads * 379, 12112)
         self.lin2 = nn.Linear(12112, 6056)
         self.lin3 = nn.Linear(6056, 3028)
         self.lin4 = nn.Linear(3028, 379)
@@ -148,7 +148,7 @@ class GATMLP(nn.Module):
         x = torch.cat([att(x, adj) for att in self.attentions], dim=1)
         x = F.dropout(x, self.dropout, training=self.training)
         x = torch.sigmoid(self.out_att(x, adj))
-        # x = torch.flatten(x)
+        x = torch.flatten(x)
         x = self.lin1(x)
         x = torch.sigmoid(x)
         x = self.lin2(x)
@@ -173,7 +173,7 @@ class TwoLayerGATMLP(nn.Module):
         for i, attention in enumerate(self.attentions2):
             self.add_module('attention2_{}'.format(i), attention)
         self.out_att2 = GraphAttentionLayer(int((nhid/2) * nheads), int((nhid/2) * nheads), dropout=dropout, alpha=alpha, concat=True)
-        self.lin1 = nn.Linear(int((nhid/2) * nheads), 379)
+        self.lin1 = nn.Linear(int((nhid/2) * nheads)*379, 379)
         self.lin2 = nn.Linear(12112, 6056)
         self.lin3 = nn.Linear(6056, 3028)
         self.lin4 = nn.Linear(3028, 379)
@@ -186,7 +186,7 @@ class TwoLayerGATMLP(nn.Module):
         x = torch.cat([att(x, adj) for att in self.attentions2], dim=1)
         x = F.dropout(x, self.dropout, training=self.training)
         x = torch.sigmoid(self.out_att2(x, adj))
-        # x = torch.flatten(x)
+        x = torch.flatten(x)
         x = self.lin1(x)
         x = torch.sigmoid(x)
         x = F.dropout(x)
@@ -214,7 +214,6 @@ class ThreeLayerGATMLP(nn.Module):
         for i, attention in enumerate(self.attentions2):
             self.add_module('attention2_{}'.format(i), attention)
         self.out_att2 = GraphAttentionLayer(int((nhid/2) * nheads), int((nhid/2) * nheads), dropout=dropout, alpha=alpha, concat=True)
-        self.lin1 = nn.Linear(int((nhid/2) * nheads) * 379, 379)
         self.attentions3 = [GraphAttentionLayer(int(nhid * nheads/2), int(nhid / 4), dropout=dropout, alpha=alpha, concat=True)
                             for _ in
                             range(nheads)]
@@ -222,7 +221,7 @@ class ThreeLayerGATMLP(nn.Module):
             self.add_module('attention2_{}'.format(i), attention)
         self.out_att3 = GraphAttentionLayer(int((nhid / 4) * nheads), int((nhid / 4) * nheads), dropout=dropout,
                                             alpha=alpha, concat=True)
-        self.lin1 = nn.Linear(int((nhid / 2) * nheads), 379)
+        self.lin1 = nn.Linear(int((nhid / 2) * nheads)*379, 379)
         self.lin2 = nn.Linear(12112, 6056)
         self.lin3 = nn.Linear(6056, 3028)
         self.lin4 = nn.Linear(3028, 379)
@@ -238,7 +237,7 @@ class ThreeLayerGATMLP(nn.Module):
         x = torch.cat([att(x, adj) for att in self.attentions3], dim=1)
         x = F.dropout(x, self.dropout, training=self.training)
         x = torch.sigmoid(self.out_att3(x, adj))
-        # x = torch.flatten(x)
+        x = torch.flatten(x)
         x = self.lin1(x)
         x = torch.sigmoid(x)
         x = self.lin2(x)
