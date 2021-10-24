@@ -13,7 +13,7 @@ class OneLayerGAT(nn.Module):
         for i, attention in enumerate(self.attentions):
             self.add_module('attention_{}'.format(i), attention)
         self.out_att = GraphAttentionLayer(nhid * nheads, nhid * nheads, dropout=dropout, alpha=alpha, concat=True)
-        self.lin1 = nn.Linear(nhid * nheads, 379)
+        self.lin1 = nn.Linear(nhid * nheads, 1)
 
     def forward(self, x, adj):
         x = F.dropout(x, self.dropout, training=self.training)
@@ -176,8 +176,8 @@ class TwoLayerGATMLP(nn.Module):
         for i, attention in enumerate(self.attentions2):
             self.add_module('attention2_{}'.format(i), attention)
         self.out_att2 = GraphAttentionLayer(int((nhid/2) * nheads), int((nhid/2) * nheads), dropout=dropout, alpha=alpha, concat=True)
-        self.lin1 = nn.Linear(int((nhid/2) * nheads)*379, 379)
-        self.lin2 = nn.Linear(12112, 6056)
+        self.lin1 = nn.Linear(int((nhid/2) * nheads)*379, 6056)
+        self.lin2 = nn.Linear(6056, 6056)
         self.lin3 = nn.Linear(6056, 3028)
         self.lin4 = nn.Linear(3028, 379)
 
@@ -224,10 +224,10 @@ class ThreeLayerGATMLP(nn.Module):
             self.add_module('attention2_{}'.format(i), attention)
         self.out_att3 = GraphAttentionLayer(int((nhid / 4) * nheads), int((nhid / 4) * nheads), dropout=dropout,
                                             alpha=alpha, concat=True)
-        self.lin1 = nn.Linear(int((nhid / 2) * nheads)*379, 379)
-        self.lin2 = nn.Linear(12112, 6056)
-        self.lin3 = nn.Linear(6056, 3028)
-        self.lin4 = nn.Linear(3028, 379)
+        self.lin1 = nn.Linear(int((nhid / 2) * nheads)*379, 3028)
+        self.lin2 = nn.Linear(3028, 3028)
+        self.lin3 = nn.Linear(3028, 1518)
+        self.lin4 = nn.Linear(1518, 379)
 
     def forward(self, x, adj):
         x = F.dropout(x, self.dropout, training=self.training)
