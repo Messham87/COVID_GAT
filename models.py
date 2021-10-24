@@ -189,10 +189,13 @@ class TwoLayerGATMLP(nn.Module):
         # x = torch.flatten(x)
         x = self.lin1(x)
         x = torch.sigmoid(x)
+        x = F.dropout(x)
         x = self.lin2(x)
         x = torch.sigmoid(x)
+        x = F.dropout(x)
         x = self.lin3(x)
         x = torch.sigmoid(x)
+        x = F.dropout(x)
         x = self.lin4(x)
         return F.relu(x)
 
