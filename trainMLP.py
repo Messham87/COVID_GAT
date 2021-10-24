@@ -137,7 +137,7 @@ model.load_state_dict(torch.load('{}.pkl'.format(best_epoch)))
 # Testing
 compute_test()
 
-test_output = model(test_features, adj)
+test_output = model(test_features, adj)[0]
 
 from scipy import stats
 
