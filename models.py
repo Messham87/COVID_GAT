@@ -143,7 +143,6 @@ class GATMLP(nn.Module):
         x = torch.cat([att(x, adj) for att in self.attentions], dim=1)
         x = F.dropout(x, self.dropout, training=self.training)
         x = torch.sigmoid(self.out_att(x, adj))
-        x = torch.flatten(x)
         x = self.lin1(x)
         x = torch.sigmoid(x)
         x = F.dropout(x)
@@ -216,10 +215,10 @@ class ThreeLayerGATMLP(nn.Module):
                             for _ in
                             range(nheads)]
         for i, attention in enumerate(self.attentions3):
-            self.add_module('attention2_{}'.format(i), attention)
+            self.add_module('attention3_{}'.format(i), attention)
         self.out_att3 = GraphAttentionLayer(int((nhid / 4) * nheads), int((nhid / 4) * nheads), dropout=dropout,
                                             alpha=alpha, concat=True)
-        self.lin1 = nn.Linear(int((nhid / 2) * nheads)*379, 3028)
+        self.lin1 = nn.Linear(int((nhid / 4) * nheads)*379, 3028)
         self.lin2 = nn.Linear(3028, 3028)
         self.lin3 = nn.Linear(3028, 1518)
         self.lin4 = nn.Linear(1518, 379)

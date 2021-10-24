@@ -136,3 +136,9 @@ model.load_state_dict(torch.load('{}.pkl'.format(best_epoch)))
 
 # Testing
 compute_test()
+
+test_output = model(test_features, adj)
+
+from scipy import stats
+
+print(stats.pearsonr(test_labels.cpu().detach().numpy(),test_output.cpu().detach().numpy()))
